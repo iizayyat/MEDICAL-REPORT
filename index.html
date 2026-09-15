@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التقارير الطبية - LSMC Reports</title>
+    
+    <!-- استدعاء مكتبات التصدير -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+
+        /* المتغيرات الأساسية */
+        :root {
+            --bg-body: #e4e7ec;
+            --bg-header: #ffffff;
+            --primary-blue: #111625; 
+            --secondary-blue: #1e3b5a; 
+            --danger-red: #dc3545; 
+            --success-green: #28a745;
+            --text-dark: #2c3e50;
+            --border-color: #ced4da;
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --canvas-bg: rgba(255, 255, 255, 0.9);
+            
+            --section-bg-start: #111625;
+            --section-bg-end: #1e3b5a;
+            --section-text: #ffffff;
+
+            --criminal-border: #f5c6cb;
+            --criminal-bg: #fff9fa;
+
+            /* صورة الخلفية للوضع النهاري */
+            --report-bg: url('IMG_3230.png'); 
+        }
+
+        /* متغيرات الوضع الليلي */
+        body.dark-mode {
+            --bg-body: #0f172a;
+            --bg-header: #1e293b;
+            --primary-blue: #93c5fd; 
+            --secondary-blue: #3b82f6; 
+            --text-dark: #f8fafc;
+            --border-color: #334155;
+            --input-bg: rgba(30, 41, 59, 0.85);
+            --canvas-bg: #e2e8f0; 
+
+            --section-bg-start: #1e293b;
+            --section-bg-end: #334155;
+            --section-text: #f1f5f9;
+
+            --criminal-border: #991b1b;
+            --criminal-bg: rgba(153, 27, 27, 0.1);
+
+            --report-bg: linear-gradient(rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.92)), url('IMG_3230.png');
+        }
+
+        /* إيقاف الانتقالات مؤقتاً أثناء التصدير */
+        .no-transition * {
+            transition: none !important;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 20px 10px;
+            color: var(--text-dark);
+            transition: background-color 0.3s ease;
+        }
+
+        /* الأزرار العلوية */
+        .header-controls {
+            max-width: 900px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: var(--bg-header);
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: background-color 0.3s ease;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            flex: 2;
+        }
+
+        .tab-btn {
+            background-color: transparent;
+            border: 2px solid var(--secondary-blue);
+            color: var(--secondary-blue);
+            padding: 8px 18px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: var(--secondary-blue);
+            color: white;
+            box-shadow: 0 4px 10px rgba(30, 59, 90, 0.3);
+        }
+
+        .center-tools {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .zoom-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-body);
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .zoom-control label {
+            font-size: 13px;
+            margin: 0;
+            color: var(--primary-blue);
+        }
+
+        .theme-toggle {
+            background-color: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, background-color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .export-container {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex: 1;
+        }
+
+        .export-btn {
+            background-color: var(--success-green);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .export-btn:hover { filter: brightness(1.1); }
+        .export-btn.jpg-btn { background-color: #fd7e14; }
+
+        /* حاوية التقرير */
+        #reportWrapper {
+            transform-origin: top center;
+            transition: transform 0.2s;
+        }
+
+        .report-page {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            background-image: var(--report-bg);
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 60px 40px 80px 40px; 
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+            box-sizing: border-box;
+            position: relative;
+            transition: background-image 0.3s ease;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 3px solid var(--secondary-blue);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .report-header.criminal { border-bottom-color: var(--danger-red); }
+
+        .report-title h3 {
+            color: var(--primary-blue);
+            margin: 0 0 5px 0;
+            font-size: 48px; 
+            font-weight: 900; 
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            -webkit-text-stroke: 1.5px var(--primary-blue); 
+            text-shadow: 0px 3px 5px rgba(0,0,0,0.2); 
+        }
+
+        .report-title h1 {
+            color: var(--primary-blue);
+            margin: 0;
+            font-size: 22px; 
+            font-weight: 700;
+        }
+
+        .report-header.criminal .report-title h1 { color: var(--danger-red); }
+
+        .section-title {
+            background: linear-gradient(90deg, var(--section-bg-start), var(--section-bg-end));
+            color: var(--section-text);
+            padding: 8px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .report-header.criminal ~ form .section-title {
+            background: linear-gradient(90deg, #8b0000, var(--danger-red));
+            color: white;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width { grid-column: 1 / -1; }
+
+        label {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--primary-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .criminal-label { color: var(--danger-red) !important; }
+
+        input[type="text"], input[type="date"], select, textarea {
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            background-color: var(--input-bg);
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+
+        .criminal-input {
+            border-color: var(--criminal-border) !important;
+            background-color: var(--criminal-bg) !important;
+        }
+
+        input[type="file"] {
+            padding: 6px;
+            border: 1px dashed var(--secondary-blue);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .image-preview {
+            display: none;
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            object-fit: cover;
+        }
+
+        /* تنسيق التوقيع */
+        .signature-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+
+        .signature-canvas {
+            border: 2px dashed var(--secondary-blue);
+            border-radius: 6px;
+            background-color: var(--canvas-bg);
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z'></path></svg>") 2 22, crosshair;
+            width: 100%;
+            max-width: 300px;
+            height: 70px;
+            transition: background-color 0.3s;
+        }
+
+        .signature-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 2px;
+        }
+
+        .signature-colors {
+            display: flex;
+            gap: 6px;
+        }
+
+        .color-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .color-btn.active {
+            border-color: #ffc107; 
+            transform: scale(1.2);
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+        }
+
+        .clear-btn {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* ================= إعدادات الطباعة والتصدير ================= */
+        @media print {
+            body { background-color: white; padding: 0; }
+            .header-controls, .clear-btn, .signature-colors { display: none !important; }
+            .report-page { box-shadow: none; margin: 0; }
+            .signature-canvas { border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- أزرار التنقل -->
+    <div class="header-controls" data-html2canvas-ignore="true">
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="openReport(event, 'MedicalReport')">تقرير طبي (Medical)</button>
+            <button class="tab-btn" onclick="openReport(event, 'MedicoLegalReport')">تقرير جنائي (Medico-Legal)</button>
+        </div>
+        
+        <div class="center-tools">
+            <div class="zoom-control">
+                <label>تكبير/تصغير:</label>
+                <input type="range" min="0.7" max="1.2" step="0.05" value="1" oninput="document.getElementById('reportWrapper').style.transform = 'scale(' + this.value + ')'">
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" title="تغيير الوضع (ليلي/نهاري)">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </div>
+
+        <div class="export-container">
+            <button class="export-btn" onclick="exportToPDF()">📄 تصدير PDF</button>
+            <button class="export-btn jpg-btn" onclick="exportToJPG()">🖼️ تصدير JPG</button>
+        </div>
+    </div>
+
+    <!-- غلاف التقرير -->
+    <div id="reportWrapper">
+        
+        <!-- ================= الصفحة الأولى: MEDICAL REPORT ================= -->
+        <div id="MedicalReport" class="report-page" style="display: block;">
+            
+            <div class="report-header">
+                <div class="report-title">
+                    <h3>Ministry of Health</h3>
+                    <h1>MEDICAL REPORT</h1>
+                </div>
+            </div>
+
+            <form>
+                <div class="section-title">
+                    <span>معلومات المريض</span>
+                    <span>Patient Information</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>الاسم <span>NAME</span></label>
+                        <input type="text" placeholder="أدخل اسم المريض">
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الميلاد <span>Date of Birth</span></label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>فصيلة الدم <span>Blood Type</span></label>
+                        <select>
+                            <option value="" disabled selected>اختر فصيلة الدم من القائمة...</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <span>التشخيص</span>
+                    <span>Diagnosis</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>وصف التشخيص <span>Detailed Diagnosis</span></label>
+                        <textarea placeholder="اكتب التشخيص التفصيلي وحالة المريض هنا..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ التشخيص <span>Date of Diagnosis</span></label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group">
+                        <label>القسم <span>Department</span></label>
+                        <select>
+                            <option value="" disabled selected>اختر القسم...</option>
+                            <option value="EMS">EMS</option>
+                            <option value="Paramedic">Paramedic</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>إرفاق صورة <span>Image Attachment</span></label>
+                        <input type="file" accept="image/*" onchange="previewImage(event, 'imgPreview1')">
+                        <img id="imgPreview1" class="image-preview" alt="معاينة الصورة المرفقة">
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <span>معلومات الطبيب</span>
+                    <span>Doctor Info.</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>اسم الدكتور <span>Doctor Name</span></label>
+                        <input type="text" placeholder="أدخل اسم الدكتور">
+                    </div>
+                    <div class="form-group">
+                        <label>الرتبة <span>Rank</span></label>
+                        <select>
+                            <option value="" disabled selected>اختر الرتبة...</option>
+                            <option value="EMR">EMR</option>
+                            <option value="EMT Intermediate">EMT Intermediate</option>
+                            <option value="EMT Advanced">EMT Advanced</option>
+                            <option value="Master EMT">Master EMT</option>
+                            <option value="Nurse">Nurse</option>
+                            <option value="Junior Paramedic">Junior Paramedic</option>
+                            <option value="Paramedic">Paramedic</option>
+                            <option value="Senior Paramedic">Senior Paramedic</option>
+                            <option value="Doctor">Doctor</option>
+                            <option value="Surgeon">Surgeon</option>
+                            <option value="Lead Paramedic">Lead Paramedic</option>
+                            <option value="Professor">Professor</option>
+                            <option value="COMMAND">COMMAND</option>
+                            <option value="Ems Deputy Chief's">Ems Deputy Chief's</option>
+                            <option value="Ems Chief's">Ems Chief's</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label style="justify-content: flex-start; gap: 8px;">التوقيع <span>Signature</span></label>
+                        <div class="signature-wrapper">
+                            <canvas id="sigCanvas1" class="signature-canvas" width="300" height="70"></canvas>
+                            <div class="signature-controls">
+                                <div class="signature-colors">
+                                    <button type="button" class="color-btn active" style="background-color: #000080;" title="أزرق" onclick="setSignatureColor('sigCanvas1', '#000080', this)"></button>
+                                    <button type="button" class="color-btn" style="background-color: #000000;" title="أسود" onclick="setSignatureColor('sigCanvas1', '#000000', this)"></button>
+                                    <button type="button" class="color-btn" style="background-color: #dc3545;" title="أحمر" onclick="setSignatureColor('sigCanvas1', '#dc3545', this)"></button>
+                                    <button type="button" class="color-btn" style="background-color: #28a745;" title="أخضر" onclick="setSignatureColor('sigCanvas1', '#28a745', this)"></button>
+                                </div>
+                                <button type="button" class="clear-btn" onclick="clearSignature('sigCanvas1')">مسح التوقيع ↺</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <!-- ================= الصفحة الثانية: Medico-Legal Report ================= -->
+        <div id="MedicoLegalReport" class="report-page">
+            
+            <div class="report-header criminal">
+                <div class="report-title">
+                    <h3>Ministry of Health</h3>
+                    <h1>MEDICO-LEGAL REPORT</h1>
+                </div>
+            </div>
+
+            <form>
+                <div class="section-title">
+                    <span>معلومات المريض</span>
+                    <span>Patient Information</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>الاسم <span>NAME</span></label>
+                        <input type="text" placeholder="أدخل اسم المريض">
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الميلاد <span>Date of Birth</span></label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>فصيلة الدم <span>Blood Type</span></label>
+                        <select>
+                            <option value="" disabled selected>اختر فصيلة الدم من القائمة...</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <span>التشخيص والحالة</span>
+                    <span>Diagnosis & Case</span>
+                </div>
+                <div class="form-grid">
+                    
+                    <div class="form-group full-width">
+                        <label class="criminal-label">الحالة الجنائية <span>Criminal Case</span></label>
+                        <input type="text" class="criminal-input" placeholder="أدخل اسم الحالة الجنائية أو رمز الكود">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>وصف التشخيص <span>Detailed Diagnosis</span></label>
+                        <textarea placeholder="اكتب التشخيص التفصيلي وحالة المريض هنا..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ التشخيص <span>Date of Diagnosis</span></label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group">
+                        <label>القسم <span>Department</span></label>
+                        <select>
+                            <option value="" disabled selected>اختر القسم...</option>
+                            <option value="EMS">EMS</option>
+                            <option value="Paramedic">Paramedic</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>إرفاق صورة <span>Image Attachment</span></label>
+                        <input type="file" accept="image/*" onchange="previewImage(event, 'imgPreview2')">
+                        <img id="imgPreview2" class="image-preview" alt="معاينة الصورة المرفقة">
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <span>معلومات الطبيب</span>
+                    <span>Doctor Info.</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>اسم الدكتور <span>Doctor Name</span></label>
+                        <input type="text" placeholder="أدخل اسم الدكتور">
+                    </div>
+                    <div class="form-group">
+                        <label>الرتبة <span>Rank</span></label>
+                        <select>
+                            <option value="" disabled selected>اختر الرتبة...</option>
+                            <option value="EMR">EMR</option>
+                            <option value="EMT Intermediate">EMT Intermediate</option>
+                            <option value="EMT Advanced">EMT Advanced</option>
+                            <option value="Master EMT">Master EMT</option>
+                            <option value="Nurse">Nurse</option>
+                            <option value="Junior Paramedic">Junior Paramedic</option>
+                            <option value="Paramedic">Paramedic</option>
+                            <option value="Senior Paramedic">Senior Paramedic</option>
+                            <option value="Doctor">Doctor</option>
+                            <option value="Surgeon">Surgeon</option>
+                            <option value="Lead Paramedic">Lead Paramedic</option>
+                            <option value="Professor">Professor</option>
+                            <option value="COMMAND">COMMAND</option>
+                            <option value="Ems Deputy Chief's">Ems Deputy Chief's</option>
+                            <option value="Ems Chief's">Ems Chief's</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label style="justify-content: flex-start; gap: 8px;">التوقيع <span>Signature</span></label>
+                        <div class="signature-wrapper">
+                            <canvas id="sigCanvas2" class="signature-canvas" width="300" height="70"></canvas>
+                            <div class="signature-controls">
+                                <div class="signature-colors">
+                                    <button type="button" class="color-btn active" style="background-color: #000080;" title="أزرق" onclick="setSignatureColor('sigCanvas2', '#000080', this)"></button>
+                                    <button type="button" class="color-btn" style="background-color: #000000;" title="أسود" onclick="setSignatureColor('sigCanvas2', '#000000', this)"></button>
+                                    <button type="button" class="color-btn" style="background-color: #dc3545;" title="أحمر" onclick="setSignatureColor('sigCanvas2', '#dc3545', this)"></button>
+                                    <button type="button" class="color-btn" style="background-color: #28a745;" title="أخضر" onclick="setSignatureColor('sigCanvas2', '#28a745', this)"></button>
+                                </div>
+                                <button type="button" class="clear-btn" onclick="clearSignature('sigCanvas2')">مسح التوقيع ↺</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div> 
+
+    <!-- السكربتات -->
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            body.classList.toggle('dark-mode');
+            
+            if(body.classList.contains('dark-mode')) {
+                icon.innerText = '☀️'; 
+            } else {
+                icon.innerText = '🌙'; 
+            }
+        }
+
+        function openReport(evt, reportName) {
+            var i, reportPages, tabBtns;
+            reportPages = document.getElementsByClassName("report-page");
+            for (i = 0; i < reportPages.length; i++) {
+                reportPages[i].style.display = "none";
+            }
+            tabBtns = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].className = tabBtns[i].className.replace(" active", "");
+            }
+            document.getElementById(reportName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        function previewImage(event, previewId) {
+            var input = event.target;
+            var reader = new FileReader();
+            reader.onload = function(){
+                var dataURL = reader.result;
+                var img = document.getElementById(previewId);
+                img.src = dataURL;
+                img.style.display = 'block';
+            };
+            if(input.files[0]) {
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function setSignatureColor(canvasId, color, btnElement) {
+            var canvas = document.getElementById(canvasId);
+            canvas.dataset.color = color; 
+            
+            var siblings = btnElement.parentElement.children;
+            for(var i = 0; i < siblings.length; i++) {
+                siblings[i].classList.remove('active');
+            }
+            btnElement.classList.add('active');
+        }
+
+        function initSignature(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext("2d");
+            let isDrawing = false;
+            
+            canvas.dataset.color = "#000080";
+
+            function getMousePos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                let clientX = e.clientX;
+                let clientY = e.clientY;
+                if(e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                }
+                return {
+                    x: (clientX - rect.left) * scaleX,
+                    y: (clientY - rect.top) * scaleY
+                };
+            }
+
+            function startDraw(e) { e.preventDefault(); isDrawing = true; const pos = getMousePos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); }
+            
+            function draw(e) { 
+                if (!isDrawing) return; 
+                e.preventDefault(); 
+                const pos = getMousePos(e); 
+                ctx.lineTo(pos.x, pos.y); 
+                
+                ctx.strokeStyle = canvas.dataset.color; 
+                ctx.lineWidth = 2.5; 
+                ctx.lineCap = "round"; 
+                ctx.lineJoin = "round"; 
+                ctx.stroke(); 
+            }
+            
+            function endDraw(e) { if (!isDrawing) return; e.preventDefault(); isDrawing = false; ctx.closePath(); }
+
+            canvas.addEventListener("mousedown", startDraw); canvas.addEventListener("mousemove", draw); canvas.addEventListener("mouseup", endDraw); canvas.addEventListener("mouseout", endDraw);
+            canvas.addEventListener("touchstart", startDraw, {passive: false}); canvas.addEventListener("touchmove", draw, {passive: false}); canvas.addEventListener("touchend", endDraw, {passive: false});
+        }
+
+        function clearSignature(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        window.onload = function() {
+            initSignature('sigCanvas1');
+            initSignature('sigCanvas2');
+        };
+
+        function getActiveReportElement() {
+            return document.getElementById('MedicalReport').style.display === 'block' ? document.getElementById('MedicalReport') : document.getElementById('MedicoLegalReport');
+        }
+
+        function prepareInputsForExport(element) {
+            document.body.classList.add('no-transition'); 
+            
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            if (isDarkMode) {
+                document.body.classList.remove('dark-mode');
+            }
+
+            var inputs = element.querySelectorAll('input[type="text"], input[type="date"]');
+            inputs.forEach(input => input.setAttribute('value', input.value));
+            
+            var textareas = element.querySelectorAll('textarea');
+            textareas.forEach(ta => ta.innerHTML = ta.value);
+
+            var fileInputs = element.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(fi => fi.style.display = 'none');
+
+            var controls = element.querySelectorAll('.signature-controls');
+            controls.forEach(ctrl => ctrl.style.display = 'none');
+
+            var wrapper = document.getElementById('reportWrapper');
+            var currentZoom = wrapper.style.transform;
+            wrapper.style.transform = 'scale(1)';
+            
+            return { fileInputs, controls, wrapper, currentZoom, wasDarkMode: isDarkMode };
+        }
+
+        function restoreInputsAfterExport(hidden) {
+            hidden.fileInputs.forEach(fi => fi.style.display = 'block');
+            hidden.controls.forEach(ctrl => ctrl.style.display = 'flex');
+            hidden.wrapper.style.transform = hidden.currentZoom; 
+            
+            if (hidden.wasDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+            
+            setTimeout(() => {
+                document.body.classList.remove('no-transition');
+            }, 50);
+        }
+
+        function exportToPDF() {
+            var element = getActiveReportElement();
+            var fileName = element.id === 'MedicalReport' ? 'Medical_Report.pdf' : 'MedicoLegal_Report.pdf';
+            var hidden = prepareInputsForExport(element);
+
+            setTimeout(() => { 
+                html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                    const { jsPDF } = window.jspdf;
+                    var pdf = new jsPDF('p', 'mm', 'a4'); 
+                    
+                    var pdfWidth = pdf.internal.pageSize.getWidth();
+                    var pdfHeight = pdf.internal.pageSize.getHeight();
+                    var margin = 10; 
+                    
+                    var maxW = pdfWidth - (margin * 2);
+                    var maxH = pdfHeight - (margin * 2);
+                    
+                    var ratio = Math.min(maxW / canvas.width, maxH / canvas.height);
+                    var imgW = canvas.width * ratio;
+                    var imgH = canvas.height * ratio;
+                    
+                    var x = (pdfWidth - imgW) / 2; 
+                    var y = margin; 
+                    
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', x, y, imgW, imgH);
+                    pdf.save(fileName);
+                    
+                    restoreInputsAfterExport(hidden);
+                });
+            }, 100);
+        }
+
+        function exportToJPG() {
+            var element = getActiveReportElement();
+            var fileName = element.id === 'MedicalReport' ? 'Medical_Report.jpg' : 'MedicoLegal_Report.jpg';
+            var hidden = prepareInputsForExport(element);
+
+            setTimeout(() => {
+                html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                    var link = document.createElement('a');
+                    link.download = fileName;
+                    link.href = canvas.toDataURL('image/jpeg', 1.0);
+                    link.click();
+                    restoreInputsAfterExport(hidden);
+                });
+            }, 100);
+        }
+    </script>
+</body>
+</html>
