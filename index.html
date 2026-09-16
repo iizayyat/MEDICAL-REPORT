@@ -213,15 +213,15 @@
 
         .report-header.criminal { border-bottom-color: var(--danger-red); }
 
-        /* تنسيق الشعار والفراغ الموازن */
         .header-logo {
             max-height: 110px;
             width: 110px;
             object-fit: contain;
+            transform: translateY(-20px); 
         }
 
         .header-spacer {
-            width: 110px; /* نفس عرض الشعار تقريباً ليظل العنوان في المنتصف */
+            width: 110px; 
         }
 
         .report-title h3 {
@@ -325,7 +325,19 @@
             object-fit: cover;
         }
 
-        /* تنسيق التوقيع */
+        /* حاوية قسم التوقيع والختم */
+        .signature-section-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 15px;
+            gap: 50px; /* مسافة قريبة ومتناسقة بين التوقيع والختم */
+        }
+
+        .signature-block {
+            width: 320px;
+        }
+
         .signature-wrapper {
             display: flex;
             flex-direction: column;
@@ -339,8 +351,7 @@
             background-color: var(--canvas-bg);
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z'></path></svg>") 2 22, crosshair;
             width: 100%;
-            max-width: 300px;
-            height: 70px;
+            height: 80px;
             transition: background-color 0.3s;
         }
 
@@ -349,8 +360,7 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            max-width: 300px;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .signature-colors {
@@ -384,6 +394,31 @@
             font-family: inherit;
             font-size: 11px;
             font-weight: 700;
+        }
+
+        /* ===== الختم باستخدام الصورة ===== */
+        .stamp-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 140px; 
+            height: 140px;
+        }
+
+        .official-stamp-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transform: rotate(-8deg); /* ميلان خفيف لواقعية الختم */
+            opacity: 0.85; 
+            mix-blend-mode: multiply; /* دمج لون الختم مع خلفية التقرير */
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* تعديل ميلان الختم في التقرير الجنائي لتمييزه */
+        .criminal .official-stamp-img {
+            transform: rotate(12deg);
         }
 
         /* إعدادات الطباعة والتصدير */
@@ -434,7 +469,7 @@
                     <h1>MEDICAL REPORT</h1>
                 </div>
                 <!-- الشعار في اليسار -->
-                <img src="https://github.com/iizayyat/MEDICAL-REPORT/blob/main/images/ems.bng.png?raw=true" alt="EMS Logo" class="header-logo" crossorigin="anonymous">
+                <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems.png" alt="EMS Logo" class="header-logo" crossorigin="anonymous">
             </div>
 
             <form>
@@ -526,19 +561,32 @@
                         </select>
                     </div>
                     
+                    <!-- حاوية التوقيع والختم -->
                     <div class="form-group full-width">
-                        <label style="justify-content: flex-start; gap: 8px; margin-bottom: 6px;">التوقيع <span>Signature</span></label>
-                        <div class="signature-wrapper">
-                            <canvas id="sigCanvas1" class="signature-canvas" width="300" height="70"></canvas>
-                            <div class="signature-controls">
-                                <div class="signature-colors">
-                                    <button type="button" class="color-btn active" style="background-color: #000080;" title="أزرق" onclick="setSignatureColor('sigCanvas1', '#000080', this)"></button>
-                                    <button type="button" class="color-btn" style="background-color: #000000;" title="أسود" onclick="setSignatureColor('sigCanvas1', '#000000', this)"></button>
-                                    <button type="button" class="color-btn" style="background-color: #dc3545;" title="أحمر" onclick="setSignatureColor('sigCanvas1', '#dc3545', this)"></button>
-                                    <button type="button" class="color-btn" style="background-color: #28a745;" title="أخضر" onclick="setSignatureColor('sigCanvas1', '#28a745', this)"></button>
+                        <div class="signature-section-container">
+                            
+                            <!-- مربع التوقيع -->
+                            <div class="signature-block">
+                                <label style="justify-content: flex-start; gap: 8px; margin-bottom: 8px;">التوقيع <span>Signature</span></label>
+                                <div class="signature-wrapper">
+                                    <canvas id="sigCanvas1" class="signature-canvas" width="350" height="80"></canvas>
+                                    <div class="signature-controls">
+                                        <div class="signature-colors">
+                                            <button type="button" class="color-btn active" style="background-color: #000080;" title="أزرق" onclick="setSignatureColor('sigCanvas1', '#000080', this)"></button>
+                                            <button type="button" class="color-btn" style="background-color: #000000;" title="أسود" onclick="setSignatureColor('sigCanvas1', '#000000', this)"></button>
+                                            <button type="button" class="color-btn" style="background-color: #dc3545;" title="أحمر" onclick="setSignatureColor('sigCanvas1', '#dc3545', this)"></button>
+                                            <button type="button" class="color-btn" style="background-color: #28a745;" title="أخضر" onclick="setSignatureColor('sigCanvas1', '#28a745', this)"></button>
+                                        </div>
+                                        <button type="button" class="clear-btn" onclick="clearSignature('sigCanvas1')">مسح التوقيع ↺</button>
+                                    </div>
                                 </div>
-                                <button type="button" class="clear-btn" onclick="clearSignature('sigCanvas1')">مسح التوقيع ↺</button>
                             </div>
+
+                            <!-- الختم (صورة من الرابط) -->
+                            <div class="stamp-wrapper">
+                                <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems%20stampp.png" alt="LSMC Stamp" class="official-stamp-img" crossorigin="anonymous">
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -547,9 +595,9 @@
 
 
         <!-- ================= الصفحة الثانية: Medico-Legal Report ================= -->
-        <div id="MedicoLegalReport" class="report-page">
+        <div id="MedicoLegalReport" class="report-page criminal">
             
-            <div class="report-header criminal">
+            <div class="report-header">
                 <!-- فراغ موازن ليبقى العنوان في المنتصف -->
                 <div class="header-spacer"></div>
                 <div class="report-title">
@@ -557,7 +605,7 @@
                     <h1>MEDICO-LEGAL REPORT</h1>
                 </div>
                 <!-- الشعار في اليسار -->
-                <img src="https://github.com/iizayyat/MEDICAL-REPORT/blob/main/images/ems.bng.png?raw=true" alt="EMS Logo" class="header-logo" crossorigin="anonymous">
+                <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems.png" alt="EMS Logo" class="header-logo" crossorigin="anonymous">
             </div>
 
             <form>
@@ -656,18 +704,29 @@
                     </div>
                     
                     <div class="form-group full-width">
-                        <label style="justify-content: flex-start; gap: 8px; margin-bottom: 6px;">التوقيع <span>Signature</span></label>
-                        <div class="signature-wrapper">
-                            <canvas id="sigCanvas2" class="signature-canvas" width="300" height="70"></canvas>
-                            <div class="signature-controls">
-                                <div class="signature-colors">
-                                    <button type="button" class="color-btn active" style="background-color: #000080;" title="أزرق" onclick="setSignatureColor('sigCanvas2', '#000080', this)"></button>
-                                    <button type="button" class="color-btn" style="background-color: #000000;" title="أسود" onclick="setSignatureColor('sigCanvas2', '#000000', this)"></button>
-                                    <button type="button" class="color-btn" style="background-color: #dc3545;" title="أحمر" onclick="setSignatureColor('sigCanvas2', '#dc3545', this)"></button>
-                                    <button type="button" class="color-btn" style="background-color: #28a745;" title="أخضر" onclick="setSignatureColor('sigCanvas2', '#28a745', this)"></button>
+                        <div class="signature-section-container">
+                            
+                            <div class="signature-block">
+                                <label style="justify-content: flex-start; gap: 8px; margin-bottom: 8px;">التوقيع <span>Signature</span></label>
+                                <div class="signature-wrapper">
+                                    <canvas id="sigCanvas2" class="signature-canvas" width="350" height="80"></canvas>
+                                    <div class="signature-controls">
+                                        <div class="signature-colors">
+                                            <button type="button" class="color-btn active" style="background-color: #000080;" title="أزرق" onclick="setSignatureColor('sigCanvas2', '#000080', this)"></button>
+                                            <button type="button" class="color-btn" style="background-color: #000000;" title="أسود" onclick="setSignatureColor('sigCanvas2', '#000000', this)"></button>
+                                            <button type="button" class="color-btn" style="background-color: #dc3545;" title="أحمر" onclick="setSignatureColor('sigCanvas2', '#dc3545', this)"></button>
+                                            <button type="button" class="color-btn" style="background-color: #28a745;" title="أخضر" onclick="setSignatureColor('sigCanvas2', '#28a745', this)"></button>
+                                        </div>
+                                        <button type="button" class="clear-btn" onclick="clearSignature('sigCanvas2')">مسح التوقيع ↺</button>
+                                    </div>
                                 </div>
-                                <button type="button" class="clear-btn" onclick="clearSignature('sigCanvas2')">مسح التوقيع ↺</button>
                             </div>
+
+                            <!-- الختم (صورة من الرابط) -->
+                            <div class="stamp-wrapper">
+                                <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems%20stampp.png" alt="LSMC Stamp" class="official-stamp-img" crossorigin="anonymous">
+                            </div>
+
                         </div>
                     </div>
                 </div>
