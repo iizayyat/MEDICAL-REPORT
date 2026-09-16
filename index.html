@@ -10,7 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+        /* استدعاء خط تاجوال الأساسي + خطوط اليد (عربي وإنجليزي) */
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Aref+Ruqaa:wght@400;700&family=Caveat:wght@600;700&display=swap');
 
         /* المتغيرات الأساسية */
         :root {
@@ -66,83 +67,98 @@
             font-family: 'Tajawal', sans-serif;
             background-color: var(--bg-body);
             margin: 0;
-            padding: 20px 10px;
+            padding: 15px 10px;
             color: var(--text-dark);
             transition: background-color 0.3s ease;
         }
 
-        /* الأزرار العلوية */
+        /* =========================================================
+           تنسيقات الشريط العلوي (تم التصغير والتنسيق)
+        ========================================================= */
         .header-controls {
             max-width: 900px;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 10px auto; 
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
             background: var(--bg-header);
-            padding: 15px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 10px 15px; /* تقليل الحشوة */
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
             transition: background-color 0.3s ease;
         }
 
         .tab-container {
             display: flex;
-            gap: 10px;
-            flex: 2;
+            gap: 8px;
+            flex: 1; /* التوزيع المتساوي */
         }
 
         .tab-btn {
             background-color: transparent;
-            border: 2px solid var(--secondary-blue);
+            border: 1.5px solid var(--secondary-blue);
             color: var(--secondary-blue);
-            padding: 8px 18px;
-            font-size: 15px;
+            padding: 5px 12px; /* تصغير الأزرار */
+            font-size: 13px; /* تصغير الخط */
             font-weight: 700;
             font-family: inherit;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .tab-btn.active {
             background-color: var(--secondary-blue);
             color: white;
-            box-shadow: 0 4px 10px rgba(30, 59, 90, 0.3);
+            box-shadow: 0 2px 6px rgba(30, 59, 90, 0.2);
         }
 
         .center-tools {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            gap: 10px;
+            flex: 1; /* التوزيع المتساوي لتكون في المنتصف تماماً */
         }
 
         .zoom-control {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
             background: var(--bg-body);
-            padding: 8px 15px;
-            border-radius: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
+            height: 22px;
         }
 
         .zoom-control label {
-            font-size: 13px;
+            font-size: 11px; /* خط أصغر */
             margin: 0;
             color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        /* تصغير شريط التكبير */
+        .zoom-control input[type="range"] {
+            width: 70px;
+            height: 4px;
+            accent-color: var(--secondary-blue);
+            cursor: pointer;
         }
 
         .theme-toggle {
             background-color: var(--bg-body);
             border: 1px solid var(--border-color);
             color: var(--text-dark);
-            font-size: 20px;
+            font-size: 15px; /* أيقونة أصغر */
             cursor: pointer;
             border-radius: 50%;
-            width: 42px;
-            height: 42px;
+            width: 32px; /* زر أصغر */
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -155,25 +171,26 @@
 
         .export-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: flex-end;
-            flex: 1;
+            flex: 1; /* التوزيع المتساوي */
         }
 
         .export-btn {
             background-color: var(--success-green);
             color: white;
             border: none;
-            padding: 8px 15px;
-            font-size: 14px;
+            padding: 5px 12px; /* تصغير الزر */
+            font-size: 12px; /* تصغير الخط */
             font-weight: 700;
             font-family: inherit;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             transition: 0.2s;
+            white-space: nowrap;
         }
         .export-btn:hover { filter: brightness(1.1); }
         .export-btn.jpg-btn { background-color: #fd7e14; }
@@ -193,12 +210,35 @@
             background-size: 100% 100%;
             background-position: center;
             background-repeat: no-repeat;
-            padding: 60px 40px 80px 40px; 
+            padding: 30px 40px 35px 40px; 
             border-radius: 12px;
             box-shadow: 0 5px 25px rgba(0,0,0,0.15);
             box-sizing: border-box;
             position: relative;
             transition: background-image 0.3s ease;
+            overflow: hidden; 
+        }
+
+        /* =========================================================
+           تنسيق العلامة المائية (Watermark)
+        ========================================================= */
+        .watermark-img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 75%; 
+            max-height: 80%;
+            object-fit: contain;
+            opacity: 0.06; 
+            pointer-events: none; 
+            z-index: 0;
+            user-select: none;
+        }
+
+        .report-header, form {
+            position: relative;
+            z-index: 1;
         }
 
         .report-header {
@@ -206,28 +246,28 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 3px solid var(--secondary-blue);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
             text-align: center;
         }
 
         .report-header.criminal { border-bottom-color: var(--danger-red); }
 
         .header-logo {
-            max-height: 110px;
-            width: 110px;
+            max-height: 95px;
+            width: 95px;
             object-fit: contain;
-            transform: translateY(-20px); 
+            transform: translateY(-8px); 
         }
 
         .header-spacer {
-            width: 110px; 
+            width: 95px; 
         }
 
         .report-title h3 {
             color: var(--primary-blue);
-            margin: 0 0 5px 0;
-            font-size: 48px; 
+            margin: 0 0 2px 0;
+            font-size: 42px; 
             font-weight: 900; 
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -238,7 +278,7 @@
         .report-title h1 {
             color: var(--primary-blue);
             margin: 0;
-            font-size: 22px; 
+            font-size: 18px; 
             font-weight: 700;
         }
 
@@ -247,11 +287,11 @@
         .section-title {
             background: linear-gradient(90deg, var(--section-bg-start), var(--section-bg-end));
             color: var(--section-text);
-            padding: 8px 15px;
+            padding: 6px 15px;
             border-radius: 6px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-            font-size: 15px;
+            margin-top: 8px; 
+            margin-bottom: 8px;
+            font-size: 14px;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
@@ -265,20 +305,28 @@
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 8px; 
+        }
+
+        .compact-info-grid {
+            display: grid;
+            grid-template-columns: 2.5fr 1fr 1fr;
+            gap: 8px;
+            align-items: end;
+            grid-column: 1 / -1;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 3px;
         }
 
         .form-group.full-width { grid-column: 1 / -1; }
 
         label {
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--primary-blue);
             display: flex;
             justify-content: space-between;
@@ -287,12 +335,34 @@
 
         .criminal-label { color: var(--danger-red) !important; }
 
-        input[type="text"], input[type="date"], select, textarea {
-            padding: 8px 10px;
+        /* =========================================================
+           تأثير خط اليد الحقيقي (Handwritten Effect)
+        ========================================================= */
+        input[type="text"], textarea {
+            padding: 5px 8px; 
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'Caveat', 'Aref Ruqaa', cursive !important;
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            color: #000080 !important; 
+            background-color: var(--input-bg);
+            transition: all 0.3s;
+        }
+
+        input[type="text"]::placeholder, textarea::placeholder {
+            font-family: 'Tajawal', sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 400 !important;
+            color: #a0aec0 !important;
+        }
+
+        input[type="date"], select {
+            padding: 5px 8px; 
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 13px;
             background-color: var(--input-bg);
             color: var(--text-dark);
             transition: all 0.3s;
@@ -303,35 +373,104 @@
             background-color: var(--criminal-bg) !important;
         }
 
-        input[type="file"] {
-            padding: 6px;
-            border: 1px dashed var(--secondary-blue);
-            border-radius: 6px;
-            font-size: 13px;
-        }
-
         textarea {
             resize: vertical;
-            min-height: 60px;
+            min-height: 40px;
         }
 
-        .image-preview {
-            display: none;
-            max-width: 100%;
-            max-height: 150px;
-            margin-top: 10px;
+        /* أزرار التحكم بحجم الخط */
+        .font-resize-controls {
+            display: flex;
+            gap: 4px;
+        }
+        .font-resize-btn {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .font-resize-btn:hover {
+            background-color: var(--secondary-blue);
+            color: white;
+        }
+
+        /* ================= تنسيقات الشبكة المصغرة للقسم الجنائي ================= */
+        .hostages-wrapper {
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 8px 10px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            object-fit: cover;
+            grid-column: 1 / -1;
         }
 
-        /* حاوية قسم التوقيع والختم */
+        body.dark-mode .hostages-wrapper {
+            background-color: rgba(30, 41, 59, 0.4);
+        }
+
+        .compact-grid {
+            display: grid;
+            grid-template-columns: 2.5fr 1fr 1fr auto; 
+            gap: 8px;
+            align-items: end;
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .compact-grid:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .add-person-btn {
+            background-color: var(--secondary-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            height: 38px; 
+            padding: 0 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-family: inherit;
+            font-weight: bold;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .add-person-btn:hover { background-color: var(--primary-blue); }
+
+        .remove-person-btn {
+            background-color: var(--danger-red);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 34px;
+            height: 38px; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        .remove-person-btn:hover { background-color: #a31526; }
+
+        /* حاوية التوقيع والختم المتقاربة */
         .signature-section-container {
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            margin-top: 15px;
-            gap: 50px; /* مسافة قريبة ومتناسقة بين التوقيع والختم */
+            margin-top: 5px;
+            gap: 40px; 
         }
 
         .signature-block {
@@ -342,7 +481,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 5px;
+            gap: 3px;
         }
 
         .signature-canvas {
@@ -351,7 +490,7 @@
             background-color: var(--canvas-bg);
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z'></path></svg>") 2 22, crosshair;
             width: 100%;
-            height: 80px;
+            height: 60px; 
             transition: background-color 0.3s;
         }
 
@@ -360,7 +499,7 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .signature-colors {
@@ -369,8 +508,8 @@
         }
 
         .color-btn {
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             border: 2px solid transparent;
             cursor: pointer;
@@ -388,35 +527,34 @@
             background-color: var(--bg-body);
             color: var(--text-dark);
             border: 1px solid var(--border-color);
-            padding: 4px 10px;
+            padding: 2px 8px;
             border-radius: 4px;
             cursor: pointer;
             font-family: inherit;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
         }
 
-        /* ===== الختم باستخدام الصورة ===== */
+        /* ===== الختم باستخدام الصورة بجانب التوقيع ===== */
         .stamp-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 140px; 
-            height: 140px;
+            width: 110px; 
+            height: 110px;
         }
 
         .official-stamp-img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            transform: rotate(-8deg); /* ميلان خفيف لواقعية الختم */
+            transform: rotate(-8deg); 
             opacity: 0.85; 
-            mix-blend-mode: multiply; /* دمج لون الختم مع خلفية التقرير */
+            mix-blend-mode: multiply; 
             pointer-events: none;
             user-select: none;
         }
 
-        /* تعديل ميلان الختم في التقرير الجنائي لتمييزه */
         .criminal .official-stamp-img {
             transform: rotate(12deg);
         }
@@ -424,19 +562,21 @@
         /* إعدادات الطباعة والتصدير */
         @media print {
             body { background-color: white; padding: 0; }
-            .header-controls, .clear-btn, .signature-colors { display: none !important; }
+            .header-controls, .clear-btn, .signature-colors, .remove-person-btn, .add-person-btn, .font-resize-controls { display: none !important; }
             .report-page { box-shadow: none; margin: 0; }
             .signature-canvas { border: 1px solid #000; }
+            .compact-info-grid { grid-template-columns: 2.5fr 1fr 1fr !important; }
+            .compact-grid { grid-template-columns: 2.5fr 1fr 1fr 0px !important; border-bottom: 1px solid #ccc; }
         }
     </style>
 </head>
 <body>
 
-    <!-- أزرار التنقل -->
+    <!-- الأزرار العلوية المصغرة والمنسقة -->
     <div class="header-controls" data-html2canvas-ignore="true">
         <div class="tab-container">
-            <button class="tab-btn active" onclick="openReport(event, 'MedicalReport')">تقرير طبي (Medical)</button>
-            <button class="tab-btn" onclick="openReport(event, 'MedicoLegalReport')">تقرير جنائي (Medico-Legal)</button>
+            <button class="tab-btn active" onclick="openReport(event, 'MedicalReport')">تقرير طبي</button>
+            <button class="tab-btn" onclick="openReport(event, 'MedicoLegalReport')">تقرير جنائي</button>
         </div>
         
         <div class="center-tools">
@@ -450,8 +590,8 @@
         </div>
 
         <div class="export-container">
-            <button class="export-btn" onclick="exportToPDF()">📄 تصدير PDF</button>
-            <button class="export-btn jpg-btn" onclick="exportToJPG()">🖼️ تصدير JPG</button>
+            <button class="export-btn" onclick="exportToPDF()">📄 PDF</button>
+            <button class="export-btn jpg-btn" onclick="exportToJPG()">🖼️ JPG</button>
         </div>
     </div>
 
@@ -461,14 +601,15 @@
         <!-- ================= الصفحة الأولى: MEDICAL REPORT ================= -->
         <div id="MedicalReport" class="report-page" style="display: block;">
             
+            <!-- العلامة المائية -->
+            <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems.png" alt="Watermark" class="watermark-img" crossorigin="anonymous">
+
             <div class="report-header">
-                <!-- فراغ موازن ليبقى العنوان في المنتصف -->
                 <div class="header-spacer"></div>
                 <div class="report-title">
                     <h3>Ministry of Health</h3>
                     <h1>MEDICAL REPORT</h1>
                 </div>
-                <!-- الشعار في اليسار -->
                 <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems.png" alt="EMS Logo" class="header-logo" crossorigin="anonymous">
             </div>
 
@@ -477,19 +618,19 @@
                     <span>معلومات المريض</span>
                     <span>Patient Information</span>
                 </div>
-                <div class="form-grid">
+                <div class="compact-info-grid">
                     <div class="form-group">
                         <label>الاسم <span>NAME</span></label>
                         <input type="text" placeholder="أدخل اسم المريض">
                     </div>
                     <div class="form-group">
-                        <label>تاريخ الميلاد <span>Date of Birth</span></label>
+                        <label>الميلاد <span>DOB</span></label>
                         <input type="date">
                     </div>
-                    <div class="form-group full-width">
-                        <label>فصيلة الدم <span>Blood Type</span></label>
+                    <div class="form-group">
+                        <label>الدم <span>Blood</span></label>
                         <select>
-                            <option value="" disabled selected>اختر فصيلة الدم من القائمة...</option>
+                            <option value="" disabled selected>اختر...</option>
                             <option value="A+">A+</option>
                             <option value="A-">A-</option>
                             <option value="B+">B+</option>
@@ -507,26 +648,30 @@
                     <span>Diagnosis</span>
                 </div>
                 <div class="form-grid">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; grid-column: 1 / -1;">
+                        <div class="form-group">
+                            <label>تاريخ التشخيص <span>Date</span></label>
+                            <input type="date">
+                        </div>
+                        <div class="form-group">
+                            <label>القسم <span>Department</span></label>
+                            <select>
+                                <option value="" disabled selected>اختر القسم...</option>
+                                <option value="EMS">EMS</option>
+                                <option value="Paramedic">Paramedic</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="form-group full-width">
-                        <label>وصف التشخيص <span>Detailed Diagnosis</span></label>
-                        <textarea placeholder="اكتب التشخيص التفصيلي وحالة المريض هنا..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>تاريخ التشخيص <span>Date of Diagnosis</span></label>
-                        <input type="date">
-                    </div>
-                    <div class="form-group">
-                        <label>القسم <span>Department</span></label>
-                        <select>
-                            <option value="" disabled selected>اختر القسم...</option>
-                            <option value="EMS">EMS</option>
-                            <option value="Paramedic">Paramedic</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>إرفاق صورة <span>Image Attachment</span></label>
-                        <input type="file" accept="image/*" onchange="previewImage(event, 'imgPreview1')">
-                        <img id="imgPreview1" class="image-preview" alt="معاينة الصورة المرفقة">
+                        <label style="justify-content: flex-start;">
+                            وصف التشخيص <span style="margin-right: 5px;">Detailed Diagnosis</span>
+                            <div class="font-resize-controls" style="margin-right: auto;">
+                                <button type="button" class="font-resize-btn" onclick="adjustFontSize('diagnosisText1', 2)" title="تكبير الخط">A+</button>
+                                <button type="button" class="font-resize-btn" onclick="adjustFontSize('diagnosisText1', -2)" title="تصغير الخط">A-</button>
+                            </div>
+                        </label>
+                        <textarea id="diagnosisText1" placeholder="اكتب التشخيص التفصيلي وحالة المريض هنا..." style="min-height: 45px; height: 45px;"></textarea>
                     </div>
                 </div>
 
@@ -561,15 +706,13 @@
                         </select>
                     </div>
                     
-                    <!-- حاوية التوقيع والختم -->
                     <div class="form-group full-width">
                         <div class="signature-section-container">
                             
-                            <!-- مربع التوقيع -->
                             <div class="signature-block">
-                                <label style="justify-content: flex-start; gap: 8px; margin-bottom: 8px;">التوقيع <span>Signature</span></label>
+                                <label style="justify-content: flex-start; gap: 8px; margin-bottom: 4px;">التوقيع <span>Signature</span></label>
                                 <div class="signature-wrapper">
-                                    <canvas id="sigCanvas1" class="signature-canvas" width="350" height="80"></canvas>
+                                    <canvas id="sigCanvas1" class="signature-canvas" width="350"></canvas>
                                     <div class="signature-controls">
                                         <div class="signature-colors">
                                             <button type="button" class="color-btn active" style="background-color: #000080;" title="أزرق" onclick="setSignatureColor('sigCanvas1', '#000080', this)"></button>
@@ -582,7 +725,6 @@
                                 </div>
                             </div>
 
-                            <!-- الختم (صورة من الرابط) -->
                             <div class="stamp-wrapper">
                                 <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems%20stampp.png" alt="LSMC Stamp" class="official-stamp-img" crossorigin="anonymous">
                             </div>
@@ -597,78 +739,90 @@
         <!-- ================= الصفحة الثانية: Medico-Legal Report ================= -->
         <div id="MedicoLegalReport" class="report-page criminal">
             
+            <!-- العلامة المائية -->
+            <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems.png" alt="Watermark" class="watermark-img" crossorigin="anonymous">
+
             <div class="report-header">
-                <!-- فراغ موازن ليبقى العنوان في المنتصف -->
                 <div class="header-spacer"></div>
                 <div class="report-title">
                     <h3>Ministry of Health</h3>
                     <h1>MEDICO-LEGAL REPORT</h1>
                 </div>
-                <!-- الشعار في اليسار -->
                 <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems.png" alt="EMS Logo" class="header-logo" crossorigin="anonymous">
             </div>
 
             <form>
                 <div class="section-title">
-                    <span>معلومات المريض</span>
-                    <span>Patient Information</span>
+                    <span>معلومات المرضى / الرهائن</span>
+                    <span>Patients / Hostages Info</span>
                 </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>الاسم <span>NAME</span></label>
-                        <input type="text" placeholder="أدخل اسم المريض">
+                
+                <div class="hostages-wrapper">
+                    <div class="compact-grid" style="border-bottom: none;">
+                        <div class="form-group">
+                            <label>الاسم <span>NAME</span></label>
+                            <input type="text" placeholder="أدخل اسم المريض / الرهينة">
+                        </div>
+                        <div class="form-group">
+                            <label>الميلاد <span>DOB</span></label>
+                            <input type="date">
+                        </div>
+                        <div class="form-group">
+                            <label>الدم <span>Blood</span></label>
+                            <select>
+                                <option value="" disabled selected>اختر...</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="justify-content: flex-end;">
+                            <button type="button" class="add-person-btn" onclick="addPersonRow()" title="إضافة شخص / رهينة آخر">+ إضافة</button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>تاريخ الميلاد <span>Date of Birth</span></label>
-                        <input type="date">
-                    </div>
-                    <div class="form-group full-width">
-                        <label>فصيلة الدم <span>Blood Type</span></label>
-                        <select>
-                            <option value="" disabled selected>اختر فصيلة الدم من القائمة...</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                        </select>
-                    </div>
+
+                    <div id="dynamicPersonsContainer"></div>
                 </div>
 
                 <div class="section-title">
                     <span>التشخيص والحالة</span>
                     <span>Diagnosis & Case</span>
                 </div>
+                
                 <div class="form-grid">
-                    
-                    <div class="form-group full-width">
-                        <label class="criminal-label">الحالة الجنائية <span>Criminal Case</span></label>
-                        <input type="text" class="criminal-input" placeholder="أدخل اسم الحالة الجنائية أو رمز الكود">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; grid-column: 1 / -1;">
+                        <div class="form-group">
+                            <label class="criminal-label">الحالة الجنائية <span>Criminal Case</span></label>
+                            <input type="text" class="criminal-input" placeholder="اسم الحالة أو الكود">
+                        </div>
+                        <div class="form-group">
+                            <label>التاريخ <span>Date</span></label>
+                            <input type="date">
+                        </div>
+                        <div class="form-group">
+                            <label>القسم <span>Dept</span></label>
+                            <select>
+                                <option value="" disabled selected>اختر...</option>
+                                <option value="EMS">EMS</option>
+                                <option value="Paramedic">Paramedic</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="form-group full-width">
-                        <label>وصف التشخيص <span>Detailed Diagnosis</span></label>
-                        <textarea placeholder="اكتب التشخيص التفصيلي وحالة المريض هنا..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>تاريخ التشخيص <span>Date of Diagnosis</span></label>
-                        <input type="date">
-                    </div>
-                    <div class="form-group">
-                        <label>القسم <span>Department</span></label>
-                        <select>
-                            <option value="" disabled selected>اختر القسم...</option>
-                            <option value="EMS">EMS</option>
-                            <option value="Paramedic">Paramedic</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>إرفاق صورة <span>Image Attachment</span></label>
-                        <input type="file" accept="image/*" onchange="previewImage(event, 'imgPreview2')">
-                        <img id="imgPreview2" class="image-preview" alt="معاينة الصورة المرفقة">
+                        <label style="justify-content: flex-start;">
+                            وصف التشخيص <span style="margin-right: 5px;">Detailed Diagnosis</span>
+                            <div class="font-resize-controls" style="margin-right: auto;">
+                                <button type="button" class="font-resize-btn" onclick="adjustFontSize('diagnosisText2', 2)" title="تكبير الخط">A+</button>
+                                <button type="button" class="font-resize-btn" onclick="adjustFontSize('diagnosisText2', -2)" title="تصغير الخط">A-</button>
+                            </div>
+                        </label>
+                        <textarea id="diagnosisText2" placeholder="اكتب التشخيص التفصيلي والحالة الجنائية هنا..." style="min-height: 45px; height: 45px;"></textarea>
                     </div>
                 </div>
 
@@ -707,9 +861,9 @@
                         <div class="signature-section-container">
                             
                             <div class="signature-block">
-                                <label style="justify-content: flex-start; gap: 8px; margin-bottom: 8px;">التوقيع <span>Signature</span></label>
+                                <label style="justify-content: flex-start; gap: 8px; margin-bottom: 4px;">التوقيع <span>Signature</span></label>
                                 <div class="signature-wrapper">
-                                    <canvas id="sigCanvas2" class="signature-canvas" width="350" height="80"></canvas>
+                                    <canvas id="sigCanvas2" class="signature-canvas" width="350"></canvas>
                                     <div class="signature-controls">
                                         <div class="signature-colors">
                                             <button type="button" class="color-btn active" style="background-color: #000080;" title="أزرق" onclick="setSignatureColor('sigCanvas2', '#000080', this)"></button>
@@ -722,7 +876,6 @@
                                 </div>
                             </div>
 
-                            <!-- الختم (صورة من الرابط) -->
                             <div class="stamp-wrapper">
                                 <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems%20stampp.png" alt="LSMC Stamp" class="official-stamp-img" crossorigin="anonymous">
                             </div>
@@ -762,18 +915,54 @@
             evt.currentTarget.className += " active";
         }
 
-        function previewImage(event, previewId) {
-            var input = event.target;
-            var reader = new FileReader();
-            reader.onload = function(){
-                var dataURL = reader.result;
-                var img = document.getElementById(previewId);
-                img.src = dataURL;
-                img.style.display = 'block';
-            };
-            if(input.files[0]) {
-                reader.readAsDataURL(input.files[0]);
-            }
+        function adjustFontSize(elementId, change) {
+            var el = document.getElementById(elementId);
+            var currentSize = parseFloat(window.getComputedStyle(el).fontSize);
+            if(isNaN(currentSize)) currentSize = 20;
+            var newSize = currentSize + change;
+            
+            if (newSize < 14) newSize = 14; 
+            if (newSize > 40) newSize = 40; 
+            
+            el.style.setProperty('font-size', newSize + 'px', 'important');
+        }
+
+        function addPersonRow() {
+            const container = document.getElementById('dynamicPersonsContainer');
+            const row = document.createElement('div');
+            row.className = 'compact-grid';
+            row.style.borderTop = '1px dashed var(--border-color)';
+            row.style.paddingTop = '8px';
+            row.style.marginTop = '8px';
+            
+            row.innerHTML = `
+                <div class="form-group">
+                    <label>الاسم <span>NAME</span></label>
+                    <input type="text" placeholder="أدخل اسم الشخص">
+                </div>
+                <div class="form-group">
+                    <label>الميلاد <span>DOB</span></label>
+                    <input type="date">
+                </div>
+                <div class="form-group">
+                    <label>الدم <span>Blood</span></label>
+                    <select>
+                        <option value="" disabled selected>اختر...</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                </div>
+                <div class="form-group" style="justify-content: flex-end;">
+                    <button type="button" class="remove-person-btn" onclick="this.parentElement.parentElement.remove()" title="حذف الشخص">✖</button>
+                </div>
+            `;
+            container.appendChild(row);
         }
 
         function setSignatureColor(canvasId, color, btnElement) {
@@ -790,6 +979,7 @@
         function initSignature(canvasId) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext("2d");
+            canvas.height = 60; 
             let isDrawing = false;
             
             canvas.dataset.color = "#000080";
@@ -859,23 +1049,36 @@
             
             var textareas = element.querySelectorAll('textarea');
             textareas.forEach(ta => ta.innerHTML = ta.value);
-
-            var fileInputs = element.querySelectorAll('input[type="file"]');
-            fileInputs.forEach(fi => fi.style.display = 'none');
+            
+            var selects = element.querySelectorAll('select');
+            selects.forEach(select => {
+                Array.from(select.options).forEach(opt => {
+                    if (opt.value === select.value) opt.setAttribute('selected', 'selected');
+                    else opt.removeAttribute('selected');
+                });
+            });
 
             var controls = element.querySelectorAll('.signature-controls');
             controls.forEach(ctrl => ctrl.style.display = 'none');
+            
+            var dynamicBtns = element.querySelectorAll('.remove-person-btn, .add-person-btn, .font-resize-controls');
+            dynamicBtns.forEach(btn => btn.style.display = 'none');
+
+            var compactGrids = element.querySelectorAll('.compact-grid');
+            compactGrids.forEach(grid => grid.style.gridTemplateColumns = '2.5fr 1fr 1fr 0px');
 
             var wrapper = document.getElementById('reportWrapper');
             var currentZoom = wrapper.style.transform;
             wrapper.style.transform = 'scale(1)';
             
-            return { fileInputs, controls, wrapper, currentZoom, wasDarkMode: isDarkMode };
+            return { controls, dynamicBtns, compactGrids, wrapper, currentZoom, wasDarkMode: isDarkMode };
         }
 
         function restoreInputsAfterExport(hidden) {
-            hidden.fileInputs.forEach(fi => fi.style.display = 'block');
             hidden.controls.forEach(ctrl => ctrl.style.display = 'flex');
+            hidden.dynamicBtns.forEach(btn => btn.style.display = ''); 
+            hidden.compactGrids.forEach(grid => grid.style.gridTemplateColumns = ''); 
+            
             hidden.wrapper.style.transform = hidden.currentZoom; 
             
             if (hidden.wasDarkMode) {
