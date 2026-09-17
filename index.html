@@ -10,8 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* استدعاء خط تاجوال الأساسي + خطوط اليد (عربي وإنجليزي) */
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Aref+Ruqaa:wght@400;700&family=Caveat:wght@600;700&display=swap');
+        /* استدعاء خط تاجوال الأساسي للتقارير الرسمية */
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
 
         /* المتغيرات الأساسية */
         :root {
@@ -72,9 +72,7 @@
             transition: background-color 0.3s ease;
         }
 
-        /* =========================================================
-           تنسيقات الشريط العلوي (تم التصغير والتنسيق)
-        ========================================================= */
+        /* الأزرار العلوية */
         .header-controls {
             max-width: 900px;
             margin: 0 auto 10px auto; 
@@ -82,83 +80,70 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
             background: var(--bg-header);
-            padding: 10px 15px; /* تقليل الحشوة */
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             transition: background-color 0.3s ease;
         }
 
         .tab-container {
             display: flex;
-            gap: 8px;
-            flex: 1; /* التوزيع المتساوي */
+            gap: 10px;
+            flex: 2;
         }
 
         .tab-btn {
             background-color: transparent;
-            border: 1.5px solid var(--secondary-blue);
+            border: 2px solid var(--secondary-blue);
             color: var(--secondary-blue);
-            padding: 5px 12px; /* تصغير الأزرار */
-            font-size: 13px; /* تصغير الخط */
+            padding: 8px 18px;
+            font-size: 15px;
             font-weight: 700;
             font-family: inherit;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
-            white-space: nowrap;
         }
 
         .tab-btn.active {
             background-color: var(--secondary-blue);
             color: white;
-            box-shadow: 0 2px 6px rgba(30, 59, 90, 0.2);
+            box-shadow: 0 4px 10px rgba(30, 59, 90, 0.3);
         }
 
         .center-tools {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            flex: 1; /* التوزيع المتساوي لتكون في المنتصف تماماً */
+            gap: 12px;
         }
 
         .zoom-control {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             background: var(--bg-body);
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
-            height: 22px;
         }
 
         .zoom-control label {
-            font-size: 11px; /* خط أصغر */
+            font-size: 13px;
             margin: 0;
             color: var(--primary-blue);
-            font-weight: 700;
-        }
-
-        /* تصغير شريط التكبير */
-        .zoom-control input[type="range"] {
-            width: 70px;
-            height: 4px;
-            accent-color: var(--secondary-blue);
-            cursor: pointer;
         }
 
         .theme-toggle {
             background-color: var(--bg-body);
             border: 1px solid var(--border-color);
             color: var(--text-dark);
-            font-size: 15px; /* أيقونة أصغر */
+            font-size: 20px;
             cursor: pointer;
             border-radius: 50%;
-            width: 32px; /* زر أصغر */
-            height: 32px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -171,26 +156,25 @@
 
         .export-container {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             justify-content: flex-end;
-            flex: 1; /* التوزيع المتساوي */
+            flex: 1;
         }
 
         .export-btn {
             background-color: var(--success-green);
             color: white;
             border: none;
-            padding: 5px 12px; /* تصغير الزر */
-            font-size: 12px; /* تصغير الخط */
+            padding: 8px 15px;
+            font-size: 14px;
             font-weight: 700;
             font-family: inherit;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             transition: 0.2s;
-            white-space: nowrap;
         }
         .export-btn:hover { filter: brightness(1.1); }
         .export-btn.jpg-btn { background-color: #fd7e14; }
@@ -219,9 +203,7 @@
             overflow: hidden; 
         }
 
-        /* =========================================================
-           تنسيق العلامة المائية (Watermark)
-        ========================================================= */
+        /* العلامة المائية */
         .watermark-img {
             position: absolute;
             top: 50%;
@@ -336,33 +318,15 @@
         .criminal-label { color: var(--danger-red) !important; }
 
         /* =========================================================
-           تأثير خط اليد الحقيقي (Handwritten Effect)
+           تنسيق الحقول الرسمية (تم إلغاء خط اليد والاعتماد على الخط الرسمي)
         ========================================================= */
-        input[type="text"], textarea {
-            padding: 5px 8px; 
+        input[type="text"], input[type="date"], select, textarea {
+            padding: 6px 10px; 
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-family: 'Caveat', 'Aref Ruqaa', cursive !important;
-            font-size: 20px !important;
-            font-weight: 700 !important;
-            color: #000080 !important; 
-            background-color: var(--input-bg);
-            transition: all 0.3s;
-        }
-
-        input[type="text"]::placeholder, textarea::placeholder {
-            font-family: 'Tajawal', sans-serif !important;
-            font-size: 13px !important;
-            font-weight: 400 !important;
-            color: #a0aec0 !important;
-        }
-
-        input[type="date"], select {
-            padding: 5px 8px; 
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 13px;
+            font-family: inherit; /* خط تاجوال الرسمي */
+            font-size: 14px;
+            font-weight: 500;
             background-color: var(--input-bg);
             color: var(--text-dark);
             transition: all 0.3s;
@@ -375,7 +339,7 @@
 
         textarea {
             resize: vertical;
-            min-height: 40px;
+            min-height: 45px;
         }
 
         /* أزرار التحكم بحجم الخط */
@@ -535,7 +499,7 @@
             font-weight: 700;
         }
 
-        /* ===== الختم باستخدام الصورة بجانب التوقيع ===== */
+        /* ===== الختم باستخدام الصورة ===== */
         .stamp-wrapper {
             display: flex;
             align-items: center;
@@ -601,7 +565,6 @@
         <!-- ================= الصفحة الأولى: MEDICAL REPORT ================= -->
         <div id="MedicalReport" class="report-page" style="display: block;">
             
-            <!-- العلامة المائية -->
             <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems.png" alt="Watermark" class="watermark-img" crossorigin="anonymous">
 
             <div class="report-header">
@@ -671,7 +634,7 @@
                                 <button type="button" class="font-resize-btn" onclick="adjustFontSize('diagnosisText1', -2)" title="تصغير الخط">A-</button>
                             </div>
                         </label>
-                        <textarea id="diagnosisText1" placeholder="اكتب التشخيص التفصيلي وحالة المريض هنا..." style="min-height: 45px; height: 45px;"></textarea>
+                        <textarea id="diagnosisText1" placeholder="اكتب التشخيص التفصيلي وحالة المريض هنا..."></textarea>
                     </div>
                 </div>
 
@@ -739,7 +702,6 @@
         <!-- ================= الصفحة الثانية: Medico-Legal Report ================= -->
         <div id="MedicoLegalReport" class="report-page criminal">
             
-            <!-- العلامة المائية -->
             <img src="https://raw.githubusercontent.com/iizayyat/MEDICAL-REPORT/main/images/ems.png" alt="Watermark" class="watermark-img" crossorigin="anonymous">
 
             <div class="report-header">
@@ -822,7 +784,7 @@
                                 <button type="button" class="font-resize-btn" onclick="adjustFontSize('diagnosisText2', -2)" title="تصغير الخط">A-</button>
                             </div>
                         </label>
-                        <textarea id="diagnosisText2" placeholder="اكتب التشخيص التفصيلي والحالة الجنائية هنا..." style="min-height: 45px; height: 45px;"></textarea>
+                        <textarea id="diagnosisText2" placeholder="اكتب التشخيص التفصيلي والحالة الجنائية هنا..."></textarea>
                     </div>
                 </div>
 
@@ -918,11 +880,11 @@
         function adjustFontSize(elementId, change) {
             var el = document.getElementById(elementId);
             var currentSize = parseFloat(window.getComputedStyle(el).fontSize);
-            if(isNaN(currentSize)) currentSize = 20;
+            if(isNaN(currentSize)) currentSize = 14;
             var newSize = currentSize + change;
             
-            if (newSize < 14) newSize = 14; 
-            if (newSize > 40) newSize = 40; 
+            if (newSize < 12) newSize = 12; 
+            if (newSize > 30) newSize = 30; 
             
             el.style.setProperty('font-size', newSize + 'px', 'important');
         }
@@ -964,6 +926,21 @@
             `;
             container.appendChild(row);
         }
+
+        /* ميزة الذكاء اللغوي: تحويل اتجاه النص تلقائياً بناءً على لغة الكتابة */
+        document.addEventListener('input', function(e) {
+            if((e.target.tagName === 'INPUT' && e.target.type === 'text') || e.target.tagName === 'TEXTAREA') {
+                var text = e.target.value.trim();
+                if(text.length > 0) {
+                    var isArabic = /[\u0600-\u06FF]/.test(text.charAt(0));
+                    e.target.style.setProperty('text-align', isArabic ? 'right' : 'left', 'important');
+                    e.target.style.setProperty('direction', isArabic ? 'rtl' : 'ltr', 'important');
+                } else {
+                    e.target.style.setProperty('text-align', 'right', 'important');
+                    e.target.style.setProperty('direction', 'rtl', 'important');
+                }
+            }
+        });
 
         function setSignatureColor(canvasId, color, btnElement) {
             var canvas = document.getElementById(canvasId);
@@ -1045,7 +1022,9 @@
             }
 
             var inputs = element.querySelectorAll('input[type="text"], input[type="date"]');
-            inputs.forEach(input => input.setAttribute('value', input.value));
+            inputs.forEach(input => {
+                input.setAttribute('value', input.value);
+            });
             
             var textareas = element.querySelectorAll('textarea');
             textareas.forEach(ta => ta.innerHTML = ta.value);
